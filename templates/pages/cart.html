@@ -34,7 +34,7 @@
             <p class="lead text-right">税込計 - ¥{{tax_included_total}}</p>
     
             <!-- Checkoutボタン -->
-            <form action="/pay/checkout/" method="POST" class="text-right">
+            <form action="/payment/checkout/" method="POST" class="text-right">
             {% csrf_token %}
             <button type="submit" class="btn btn-info">Checkout</button>
             </form>

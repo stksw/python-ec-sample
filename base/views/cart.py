@@ -55,7 +55,7 @@ class AddCartView(View):
 
 def remove_from_cart(request, item_pk):
     cart = request.session.get('cart', None)
-    if cart is not None:
+    if cart is not None and item_pk in cart['items']:
         del cart['items'][item_pk]
         request.session['cart'] = cart
     return redirect('/cart/')

@@ -68,6 +68,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'config.custom_context_processors.base'
             ],
         },
     },
@@ -138,6 +139,7 @@ TAX_RATE = 0.1
 STRIPE_API_SECRET_KEY = env.str('STRIPE_API_SECRET_KEY')
 BASE_URL = env.str('BASE_URL')
 
+
 # カスタムユーザーモデル
 AUTH_USER_MODEL = 'base.User'
 
@@ -145,3 +147,6 @@ LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_URL = '/logout/'
 LOGOUT_REDIRECT_URL = '/login/'
+
+# custom_context_processors
+TITLE = 'EC Sample'

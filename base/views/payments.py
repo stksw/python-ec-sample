@@ -3,6 +3,7 @@ from django.views.generic import View, TemplateView
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core import serializers
+from django.contrib import messages
 from base.models import Item, Order
 import stripe
 import json
@@ -43,11 +44,13 @@ class PaymentCancelView(LoginRequiredMixin, TemplateView):
 class PaymentWithStripe(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         if not check_profile_filled(request.user.profile):
+            messages.warning(self.request, '配送のためプロフィールを入力してください。')
             return redirect('/profile/')
         
         cart = request.session.get('cart', None)
         if cart is not None or len(cart) == 0:
-          return redirect('/')
+            messages.info(self.request, 'カートが空です')
+            return redirect('/')
 
         line_items = []
         order_items = [] 

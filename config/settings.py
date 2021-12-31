@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
+from django.contrib import messages
 from pathlib import Path
 import environ
 
@@ -150,3 +151,11 @@ LOGOUT_REDIRECT_URL = '/login/'
 
 # custom_context_processors
 TITLE = 'EC Sample'
+
+MESSAGE_TAGS = {
+    messages.ERROR: 'rounded-0 alert alert-danger',
+    messages.WARNING: 'rounded-0 alert alert-warning',
+    messages.SUCCESS: 'rounded-0 alert alert-success',
+    messages.INFO: 'rounded-0 alert alert-info',
+    messages.DEBUG: 'rounded-0 alert alert-secondary',
+}

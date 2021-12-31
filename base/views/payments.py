@@ -2,8 +2,10 @@ from django.shortcuts import redirect
 from django.views.generic import View, TemplateView
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
-from base.models import Item
+from django.core import serializers
+from base.models import Item, Order
 import stripe
+import json
 
 stripe.api_key = settings.STRIPE_API_SECRET_KEY
 
@@ -11,7 +13,11 @@ class PaymentSuccessView(LoginRequiredMixin, TemplateView):
     template_name = 'pages/success.html'
 
     def get(self, request, *args, **kwargs):
-        # 
+        # 注文履歴を保存
+        order = Order.objects.filter(user=request.user).order_by('-created_at')[0]
+        order.is_confirmed = True
+        order.save()
+
         # セッション変数のカートを削除
         del request.session['cart']
         return super().get(request, *args, **kwargs)
@@ -20,10 +26,18 @@ class PaymentCancelView(LoginRequiredMixin, TemplateView):
     template_name = 'pages/cancel.html'
 
     # *argsはタプル型の引数, **kwargsは辞書型のキーワード引数
-    def get(self, request, *args, **kwargs):
-        # Orderオブジェクトを取得
+    def get(self, request, *args, **kwargs): 
         # 在庫数と販売数を戻す
-        # is_confirmedがFalseであれば削除
+        order = Order.objects.filter(user=request.user).order_by('-created_at')[0]
+        for elm in json.loads(order.items):
+            item = Item.objects.get(pk=elm['pk'])
+            item.sold_count -= elm['quantity']
+            item.stock += elm['quantity']
+            item.save()
+            
+        # is_confirmedがFalseなら削除
+        if not order.is_confirmed:
+            order.delete()
         return super().get(request, *args, **kwargs)
 
 class PaymentWithStripe(LoginRequiredMixin, View):
@@ -36,13 +50,35 @@ class PaymentWithStripe(LoginRequiredMixin, View):
           return redirect('/')
 
         line_items = []
+        order_items = [] 
         for item_pk, quantity in cart['items'].items():
             item = Item.objects.get(pk=item_pk)
             line_item = create_line_item(item.price, item.name, quantity)
             line_items.append(line_item)
 
+            # 注文履歴用
+            order_items.append({
+                'pk': item.pk,
+                'name': item.name,
+                'image': str(item.image),
+                'price': item.price,
+                'quantity': quantity,
+            })
+            item.stock -= quantity
+            item.sold_count += quantity
+            item.save()
+        
+        Order.objects.create(
+            user=self.request.user,
+            uid=self.request.user.pk,
+            items=json.loads(order_items),
+            shipping=serializers.serialize('json', [request.user.profile]),
+            amount=cart['total'],
+            tax_included=cart['tax_included_total']
+        )
+
         checkout_session = stripe.checkout.Session.create(
-            # customer_email = request.user.email,
+            customer_email = request.user.email,
             payment_method_types=['card'],
             line_items=line_items,
             mode='payment',

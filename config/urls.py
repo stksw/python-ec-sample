@@ -16,8 +16,10 @@ urlpatterns = [
     path('payment/checkout/', views.PaymentWithStripe.as_view()),
     path('payment/success/', views.PaymentSuccessView.as_view()),
     path('payment/cancel/', views.PaymentCancelView.as_view()),
+    path('orders/', views.OrderIndexView.as_view()),
+    path('orders/<str:pk>', views.OrderDetailView.as_view()),
 
-    path('login/', views.Login.as_view()),
+    path('login/', views.UserLoginView.as_view()),
     path('logout/', LogoutView.as_view()),
     path('signup/', views.SignUpView.as_view()),
     path('account/', views.AccountUpdateView.as_view()),

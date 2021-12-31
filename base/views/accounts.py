@@ -6,8 +6,6 @@ from base.models import Profile
 from base.forms import UserCreationForm
 
 
-
-
 class SignUpView(CreateView):
     form_class = UserCreationForm
     success_url = '/login/'
@@ -16,7 +14,7 @@ class SignUpView(CreateView):
     def form_valid(self, form):
         return super().form_valid(form)
 
-class Login(LoginView):
+class UserLoginView(LoginView):
     template_name = 'pages/login_signup.html'
 
     def form_valid(self, form):

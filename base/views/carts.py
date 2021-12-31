@@ -14,6 +14,8 @@ class CartListView(LoginRequiredMixin, ListView):
 
     def get_queryset(self) -> QuerySet:
         cart = self.request.session.get('cart', None)
+        print('#############')
+        print(cart)
         if cart is None or len(cart) == 0:
             return redirect('/')
         self.queryset = []

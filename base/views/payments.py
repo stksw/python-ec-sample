@@ -48,7 +48,7 @@ class PaymentWithStripe(LoginRequiredMixin, View):
             return redirect('/profile/')
         
         cart = request.session.get('cart', None)
-        if cart is not None or len(cart) == 0:
+        if cart is None or len(cart) == 0:
             messages.info(self.request, 'カートが空です')
             return redirect('/')
 
@@ -74,7 +74,7 @@ class PaymentWithStripe(LoginRequiredMixin, View):
         Order.objects.create(
             user=self.request.user,
             uid=self.request.user.pk,
-            items=json.loads(order_items),
+            items=json.dumps(order_items),
             shipping=serializers.serialize('json', [request.user.profile]),
             amount=cart['total'],
             tax_included=cart['tax_included_total']

@@ -1,6 +1,6 @@
 secrets/.env
 **/*.pyc
 **/**/*.pyc
-**/**/**/__pycache__/*
+**/**/**/*.pyc
 
-
+db.sqlite3
